@@ -1,28 +1,24 @@
-import os
+# import os
 
-from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
-from flask_session import Session
+# from cs50 import SQL
+from flask import Flask, flash, redirect, render_template, request, session, Blueprint
+
+from functools import wraps
+
+# from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd
+from finance.helpers import apology, login_required, lookup, usd
 
-# Configure application
-app = Flask(__name__)
-
-# Custom filter
-app.jinja_env.filters["usd"] = usd
-
-# Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+# db = SQL("sqlite:///finance.db")
 
 
-@app.after_request
+bp = Blueprint("stock", __name__)
+
+
+@bp.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -31,28 +27,28 @@ def after_request(response):
     return response
 
 
-@app.route("/")
+@bp.route("/")
 @login_required
 def index():
     """Show portfolio of stocks"""
     return apology("TODO")
 
 
-@app.route("/buy", methods=["GET", "POST"])
+@bp.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
     """Buy shares of stock"""
     return apology("TODO")
 
 
-@app.route("/history")
+@bp.route("/history")
 @login_required
 def history():
     """Show history of transactions"""
     return apology("TODO")
 
 
-@app.route("/login", methods=["GET", "POST"])
+@bp.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
 
@@ -91,7 +87,7 @@ def login():
         return render_template("login.html")
 
 
-@app.route("/logout")
+@bp.route("/logout")
 def logout():
     """Log user out"""
 
@@ -102,20 +98,20 @@ def logout():
     return redirect("/")
 
 
-@app.route("/quote", methods=["GET", "POST"])
+@bp.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
     """Get stock quote."""
     return apology("TODO")
 
 
-@app.route("/register", methods=["GET", "POST"])
+@bp.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
     return apology("TODO")
 
 
-@app.route("/sell", methods=["GET", "POST"])
+@bp.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
     """Sell shares of stock"""

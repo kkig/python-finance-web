@@ -1,7 +1,9 @@
 import requests
 
-from flask import redirect, render_template, session
+from flask import redirect, render_template, session, Blueprint
 from functools import wraps
+
+# # bp = Blueprint("helpers", __name__)
 
 
 def apology(message, code=400):
@@ -55,7 +57,7 @@ def lookup(symbol):
         return {
             "name": quote_data["companyName"],
             "price": quote_data["latestPrice"],
-            "symbol": symbol.upper()
+            "symbol": symbol.upper(),
         }
     except requests.RequestException as e:
         print(f"Request error: {e}")
