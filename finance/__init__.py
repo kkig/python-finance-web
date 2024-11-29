@@ -15,7 +15,7 @@ def create_app(test_config=None):
         # used by flask and extensions to keep data safe
         SECRET_KEY="dev",
         # path to SQLite database - it's under app.instance_path
-        DATABASE=os.path.join(app.instance_path, "finance.sqlite"),
+        DATABASE=os.path.join(app.instance_path, "finance.db"),
     )
 
     if test_config is None:

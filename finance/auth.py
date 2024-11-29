@@ -20,7 +20,7 @@ def after_request(response):
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
-    return apology("TODO")
+    return render_template("register.html")
 
 
 @bp.route("/login", methods=["GET", "POST"])
