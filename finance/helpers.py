@@ -1,6 +1,6 @@
 import requests
 
-from flask import redirect, render_template, session
+from flask import render_template
 
 
 def apology(message, code=400):
