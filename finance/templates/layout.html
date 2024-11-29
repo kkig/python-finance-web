@@ -19,9 +19,12 @@
     ></script>
 
     <!-- https://favicon.io/emoji-favicons/money-bag/ -->
-    <link href="/static/favicon.ico" rel="icon" />
+    <link href="{{ url_for('static', filename='favicon.ico')}}" rel="icon" />
 
-    <link href="/static/styles.css" rel="stylesheet" />
+    <link
+      href="{{ url_for('static', filename='styles.css') }}"
+      rel="stylesheet"
+    />
 
     <title>C$50 Finance: {% block title %}{% endblock %}</title>
   </head>
@@ -100,7 +103,7 @@
         <input name="fragment" type="hidden" />
         <input
           alt="Validate"
-          src="/static/I_heart_validator.png"
+          src="{{ url_for('static', filename='I_heart_validator.png') }}"
           type="image"
         />
         <!-- https://validator.w3.org/ -->
