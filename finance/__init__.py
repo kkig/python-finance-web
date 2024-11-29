@@ -43,8 +43,10 @@ def create_app(test_config=None):
     )
     Session(app)
 
+    from . import auth
     from . import stock
 
+    app.register_blueprint(auth.bp)
     app.register_blueprint(stock.bp)
 
     # Register close_db and init_db_command
