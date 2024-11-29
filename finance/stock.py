@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, request, session, Blueprint
 
-from finance.helpers import apology, login_required, lookup, usd
-
+from finance.helpers import apology, lookup, usd
+from finance.auth import login_required
 
 bp = Blueprint("stock", __name__)
 
@@ -10,7 +10,7 @@ bp = Blueprint("stock", __name__)
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    return render_template("stock/index.html")
 
 
 @bp.route("/buy", methods=["GET", "POST"])

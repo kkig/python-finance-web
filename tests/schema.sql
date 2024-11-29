@@ -1,7 +1,7 @@
 CREATE TABLE
     users (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        username TEXT NOT NULL,
+        username TEXT NOT NULL UNIQUE,
         hash TEXT NOT NULL,
         cash NUMERIC NOT NULL DEFAULT 10000.00
     );

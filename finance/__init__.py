@@ -16,6 +16,11 @@ def create_app(test_config=None):
         SECRET_KEY="dev",
         # path to SQLite database - it's under app.instance_path
         DATABASE=os.path.join(app.instance_path, "finance.db"),
+        # Configure session to use cachelib (instead of signed cookies)
+        SESSION_PERMANENT=False,
+        SESSION_TYPE="cachelib",
+        SESSION_SERIALIZATION_FORMAT="json",
+        SESSION_CACHELIB=FileSystemCache(threshold=500, cache_dir=app.instance_path),
     )
 
     if test_config is None:
@@ -34,15 +39,10 @@ def create_app(test_config=None):
     # Custom filter
     app.jinja_env.filters["usd"] = usd
 
-    # Configure session to use cachelib (instead of signed cookies)
-    app.config["SESSION_PERMANENT"] = False
-    app.config["SESSION_TYPE"] = "cachelib"
-    app.config["SESSION_SERIALIZATION_FORMAT"] = "json"
-    app.config["SESSION_CACHELIB"] = FileSystemCache(
-        threshold=500, cache_dir=app.instance_path
-    )
+    # Session
     Session(app)
 
+    # Register blueprints
     from . import auth
     from . import stock
 
