@@ -1,9 +1,7 @@
 import requests
 
-from flask import redirect, render_template, session, Blueprint
+from flask import redirect, render_template, session
 from functools import wraps
-
-# # bp = Blueprint("helpers", __name__)
 
 
 def apology(message, code=400):

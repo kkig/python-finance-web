@@ -1,18 +1,8 @@
-# import os
-
-# from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session, Blueprint
 
-from functools import wraps
-
-# from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from finance.helpers import apology, login_required, lookup, usd
-
-
-# Configure CS50 Library to use SQLite database
-# db = SQL("sqlite:///finance.db")
 
 
 bp = Blueprint("stock", __name__)

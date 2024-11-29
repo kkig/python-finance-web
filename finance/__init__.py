@@ -3,7 +3,7 @@ import os
 from flask import Flask
 from flask_session import Session
 
-# import requests
+from cachelib.file import FileSystemCache
 
 from finance.helpers import usd
 
@@ -34,9 +34,13 @@ def create_app(test_config=None):
     # Custom filter
     app.jinja_env.filters["usd"] = usd
 
-    # Configure session to use filesystem (instead of signed cookies)
+    # Configure session to use cachelib (instead of signed cookies)
     app.config["SESSION_PERMANENT"] = False
-    app.config["SESSION_TYPE"] = "filesystem"
+    app.config["SESSION_TYPE"] = "cachelib"
+    app.config["SESSION_SERIALIZATION_FORMAT"] = "json"
+    app.config["SESSION_CACHELIB"] = FileSystemCache(
+        threshold=500, cache_dir=app.instance_path
+    )
     Session(app)
 
     from . import stock
