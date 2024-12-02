@@ -13,12 +13,12 @@ def test_post(client, auth):
     auth.login()
 
     """Return apology page when input is empty."""
-    response = client.post("/quote", data={"qSymbol": ""})
+    response = client.post("/quote", data={"symbol": ""})
     assert response.status_code == 200
     assert b"Symbol for quote is required." in response.data
 
     """Return quote to page."""
-    response = client.post("/quote", data={"qSymbol": "NFLX"})
+    response = client.post("/quote", data={"symbol": "NFLX"})
     assert response.status_code == 200
     assert b"NFLX" in response.data
 
@@ -27,6 +27,6 @@ def test_post_symbol(client, auth):
     auth.login()
 
     """Return apology page when symbol is invalid."""
-    response = client.post("/quote", data={"qSymbol": "lok"})
+    response = client.post("/quote", data={"symbol": "lok"})
     assert response.status_code == 200
     assert b"Invalid symbol for quote." in response.data

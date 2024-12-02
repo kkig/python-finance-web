@@ -34,7 +34,7 @@ def quote():
     quote = None
 
     if request.method == "POST":
-        symbol = request.form.get("qSymbol")
+        symbol = request.form.get("symbol")
         quote = lookup(symbol)
         error = None
 
