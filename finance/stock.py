@@ -1,6 +1,6 @@
-from flask import flash, redirect, render_template, request, session, Blueprint
+from flask import render_template, request, Blueprint
 
-from finance.helpers import apology, lookup, usd
+from finance.helpers import apology, lookup
 from finance.auth import login_required
 
 bp = Blueprint("stock", __name__)
@@ -31,7 +31,20 @@ def history():
 @login_required
 def quote():
     """Get stock quote."""
-    return apology("TODO")
+    quote = None
+
+    if request.method == "POST":
+        symbol = request.form.get("qSymbol")
+
+        if symbol is None:
+            return apology("Symbol for quote is required.")
+
+        quote = lookup(symbol)
+        print(quote)
+        if quote is None:
+            return apology("Invalid symbol for quote.")
+
+    return render_template("stock/quote.html", quote=quote)
 
 
 @bp.route("/sell", methods=["GET", "POST"])
