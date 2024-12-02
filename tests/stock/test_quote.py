@@ -14,7 +14,8 @@ def test_post(client, auth):
 
     """Return apology page when input is empty."""
     response = client.post("/quote", data={"qSymbol": ""})
-    assert response.status_code == 400
+    assert response.status_code == 200
+    assert b"Symbol for quote is required." in response.data
 
     """Return quote to page."""
     response = client.post("/quote", data={"qSymbol": "NFLX"})
@@ -27,4 +28,5 @@ def test_post_symbol(client, auth):
 
     """Return apology page when symbol is invalid."""
     response = client.post("/quote", data={"qSymbol": "lok"})
-    assert response.status_code == 400
+    assert response.status_code == 200
+    assert b"Invalid symbol for quote." in response.data

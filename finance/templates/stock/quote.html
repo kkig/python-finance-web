@@ -21,4 +21,8 @@
   A share of {{ quote["name"] }} ({{ quote["symbol"] }}) costs ${{
   quote["price"] }}.
 </div>
-{% endif %} {% endblock %}
+{% endif %} {% for message in get_flashed_messages() %}
+<div class="mb-3">
+  <div>{{ message }}</div>
+</div>
+{% endfor %} {% endblock %}

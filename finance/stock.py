@@ -1,4 +1,4 @@
-from flask import render_template, request, Blueprint
+from flask import flash, render_template, request, Blueprint
 
 from finance.helpers import apology, lookup
 from finance.auth import login_required
@@ -35,14 +35,15 @@ def quote():
 
     if request.method == "POST":
         symbol = request.form.get("qSymbol")
-
-        if symbol is None:
-            return apology("Symbol for quote is required.")
-
         quote = lookup(symbol)
-        print(quote)
-        if quote is None:
-            return apology("Invalid symbol for quote.")
+        error = None
+
+        if symbol == "":
+            error = "Symbol for quote is required."
+        elif quote is None:
+            error = "Invalid symbol for quote."
+
+        flash(error)
 
     return render_template("stock/quote.html", quote=quote)
 
