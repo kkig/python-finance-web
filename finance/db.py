@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 from flask import current_app, g
 
@@ -23,3 +24,6 @@ def close_db(e=None):
 # Function to register close_db to app
 def init_app(app):
     app.teardown_appcontext(close_db)
+
+
+sqlite3.register_converter("timestamp", lambda v: datetime.fromisoformat(v.decode()))

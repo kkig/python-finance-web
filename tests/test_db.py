@@ -13,3 +13,21 @@ def test_get_close_db(app):
         db.execute("SELECT 1")
 
     assert "closed" in str(e.value)
+
+
+def test_insert_transaction(app):
+    with app.app_context():
+        db = get_db()
+        db.execute(
+            "INSERT INTO transactions (user_id, symbol, shares, price)"
+            "   VALUES (?, ?, ?, ?)",
+            (
+                1,
+                "nflx",
+                5,
+                500.25,
+            ),
+        )
+
+        count = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
+        assert count == 2

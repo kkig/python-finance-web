@@ -7,19 +7,13 @@ CREATE TABLE
     );
 
 CREATE TABLE
-    symbols (
-        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        symbol TEXT NOT NULL UNIQUE
-    );
-
-CREATE TABLE
     transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         user_id INTEGER NOT NULL,
-        symbol_id INTEGER NOT NULL shares TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        shares INTEGER NOT NULL,
         price REAL NOT NULL,
-        date TEXT NOT NULL,
-        FOREIGN KEY (symbol_id) REFERENCES symbols (id),
+        date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id)
     );
 
