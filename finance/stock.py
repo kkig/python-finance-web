@@ -1,11 +1,10 @@
 from flask import flash, render_template, url_for, redirect, request, g, Blueprint
-import sqlite3
 from werkzeug.exceptions import abort
 
 from finance.helpers import apology, lookup, usd
 
 from finance.auth import login_required
-from finance.db import get_db
+from finance.db import get_db, database
 
 bp = Blueprint("stock", __name__)
 
@@ -66,38 +65,29 @@ def index():
 def buy():
     """Buy shares of stock"""
     if request.method == "POST":
+        # Validate inputs
         symbol = request.form.get("symbol")
         shares = request.form.get("shares")
-        db, quote, error = get_db(), None, None
+        db, quote = database(), lookup(symbol)
+        error = None
 
         if not symbol or not shares:
-            error = "Missing symbol." if not symbol else "Missing shares."
+            error = "Symbol and shares are required."
         elif not shares.isnumeric():
             error = "Invalid value for shares."
-        else:
-            quote = lookup(symbol)
-            error = None if quote else "Invalid symbol."
+        elif quote is None:
+            error = "Invalid symbol."
 
         if error is None:
-            try:
-                db.execute(
-                    "INSERT INTO transactions (user_id, symbol, shares, price)"
-                    "   VALUES (?, ?, ?, ?)",
-                    (
-                        g.user["id"],
-                        symbol,
-                        int(shares),
-                        quote["price"],
-                    ),
-                )
-                db.commit()
-            except sqlite3.Error as e:
-                # Error inserting data
-                error = e.sqlite_errorname
-                print(error)
-            else:
-                # Success
-                return redirect(url_for("stock.index"))
+            user_id, price = g.user["id"], quote["price"]
+            cash = db.get("cash", user_id)
+            cash_remain = cash - (int(shares) * price)
+
+            data = {"id": user_id, "symbol": symbol, "shares": shares, "price": price}
+            db.update("cash", user_id, cash_remain)
+            db.insert("trans", **data)
+            # Success
+            return redirect(url_for("stock.index"))
 
         flash(error)
 

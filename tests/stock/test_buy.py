@@ -1,7 +1,7 @@
 import pytest
 from flask import g
 
-from finance.db import get_db
+from finance.db import database
 from finance.stock import get_stock_total
 
 
@@ -37,21 +37,22 @@ def test_post(app, client, auth):
 def test_post_insert(app, client, auth):
     """Post request with valid data should add data to database"""
     auth.login()
+    client.post("/buy", data={"symbol": "nflx", "shares": "10"})
 
     with app.app_context():
-        db = get_db()
-        count = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
+        db = database()
+        count = db.execute(
+            "SELECT COUNT(id) FROM transactions WHERE user_id = ?", (1,)
+        ).fetchone()[0]
 
-        client.post("/buy", data={"symbol": "nflx", "shares": "10"})
-        count_new = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
-        assert count_new == count + 1
+        assert count == 4
 
 
 @pytest.mark.parametrize(
     ("symbol", "shares", "message"),
     (
-        ("", "", b"Missing symbol."),
-        ("nflx", "", b"Missing shares."),
+        ("", "", b"Symbol and shares are required."),
+        ("nflx", "", b"Symbol and shares are required."),
         ("lok", "3", b"Invalid symbol."),
         ("nflx", "-5", b"Invalid value for shares."),
     ),

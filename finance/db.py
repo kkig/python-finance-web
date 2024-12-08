@@ -81,10 +81,11 @@ class DB:
         :param id: int - id of user
         :return: float - cash of the user
         """
-        return self.execute(
+        cash = self.execute(
             "SELECT cash FROM users WHERE id = ?",
             (id,),
-        ).fetchone()[0]
+        ).fetchone()
+        return cash[0] if cash else None
 
     def update_cash(self, id, cash):
         """Update cash of the user.
@@ -112,7 +113,7 @@ class Caller:
             elif key == "cash":
                 res = self.db.get_cash(*args)
         except sqlite3.Error as e:
-            print(e.sqlite_errorname)
+            print(e)
         return res
 
     def insert(self, table, **kwargs):
@@ -121,7 +122,7 @@ class Caller:
                 self.db.insert_trans(**kwargs)
                 self.db.commit()
         except sqlite3.Error as e:
-            print(e.sqlite_errorname)
+            print(e)
 
     def update(self, key, *args):
         try:
@@ -129,7 +130,7 @@ class Caller:
                 self.db.update_cash(*args)
                 self.db.commit()
         except sqlite3.Error as e:
-            print(e.sqlite_errorname)
+            print(e)
 
 
 def database():

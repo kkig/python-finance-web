@@ -50,22 +50,29 @@ class TestTrans:
         assert stocks[1]["shares"] == 6
 
 
-class TestUser:
+class TestUsers:
     def test_get_cash(self, app):
+        """Should return ther cash user has."""
         with app.app_context():
             db = database()
             cash = db.get("cash", 1)
 
         assert cash == 10000.00
 
+    def test_get_cash_invalid_user(self, app):
+        """Invalid user_id should return None."""
+        with app.app_context():
+            db = database()
+            cash = db.get("cash", 10)
+
+        assert cash is None
+
     def test_update_cash(self, app):
         with app.app_context():
             db, id = database(), 1
-            prev = db.execute("SELECT cash FROM users WHERE id = ?", (id,)).fetchone()[
-                0
-            ]
+            prev = db.get("cash", id)
             db.update("cash", 1, 500)
 
-            new = db.execute("SELECT cash FROM users WHERE id = ?", (id,)).fetchone()[0]
+            new = db.get("cash", id)
 
         assert new != prev
