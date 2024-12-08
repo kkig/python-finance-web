@@ -1,7 +1,7 @@
 import sqlite3
 
 import pytest
-from finance.db import get_db
+from finance.db import database, get_db
 
 
 def test_get_close_db(app):
@@ -15,19 +15,57 @@ def test_get_close_db(app):
     assert "closed" in str(e.value)
 
 
-def test_insert_transaction(app):
+def test_caller(app):
+    """Caller should return BD's methods when valid key is passed"""
     with app.app_context():
-        db = get_db()
-        db.execute(
-            "INSERT INTO transactions (user_id, symbol, shares, price)"
-            "   VALUES (?, ?, ?, ?)",
-            (
-                1,
-                "nflx",
-                5,
-                500.25,
-            ),
-        )
+        db = database()
+        res = db.get("shares", 1)
 
-        count = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
-        assert count == 2
+    assert res is not None
+
+    """Caller should return None when invalid key is passed."""
+    with app.app_context():
+        db = database()
+        res = db.get("date", 1)
+
+    assert res is None
+
+
+class TestTrans:
+    def test_insert_trans(self, app):
+        with app.app_context():
+            db = database()
+            count = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
+            data = {"id": 1, "symbol": "nflx", "shares": 5, "price": 500.25}
+            db.insert("trans", **data)
+
+            count_new = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
+            assert count_new == count + 1
+
+    def test_get_shares(self, app):
+        with app.app_context():
+            db = database()
+            stocks = db.get("shares", 1)
+        assert stocks[1]["symbol"] == "nflx"
+        assert stocks[1]["shares"] == 6
+
+
+class TestUser:
+    def test_get_cash(self, app):
+        with app.app_context():
+            db = database()
+            cash = db.get("cash", 1)
+
+        assert cash == 10000.00
+
+    def test_update_cash(self, app):
+        with app.app_context():
+            db, id = database(), 1
+            prev = db.execute("SELECT cash FROM users WHERE id = ?", (id,)).fetchone()[
+                0
+            ]
+            db.update("cash", 1, 500)
+
+            new = db.execute("SELECT cash FROM users WHERE id = ?", (id,)).fetchone()[0]
+
+        assert new != prev

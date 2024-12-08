@@ -1,6 +1,8 @@
 import pytest
+from flask import g
 
 from finance.db import get_db
+from finance.stock import get_stock_total
 
 
 def test_get_login_required(client, auth):
@@ -37,10 +39,12 @@ def test_post_insert(app, client, auth):
     auth.login()
 
     with app.app_context():
-        client.post("/buy", data={"symbol": "nflx", "shares": "10"})
         db = get_db()
         count = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
-        assert count == 2
+
+        client.post("/buy", data={"symbol": "nflx", "shares": "10"})
+        count_new = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
+        assert count_new == count + 1
 
 
 @pytest.mark.parametrize(
@@ -61,3 +65,15 @@ def test_post_validates(client, auth, symbol, shares, message):
     assert response.status_code == 200
     assert b"Buy" in response.data
     assert message in response.data
+
+
+def test_get_stock_total(app, auth):
+    with app.app_context():
+        auth.login()
+        data = get_stock_total(1)
+        stocks = data["stocks"]
+        amzn = stocks[0]
+
+        assert amzn["symbol"] == "amzn"
+        assert amzn["shares"] == 5
+        assert data["total"] is not None
