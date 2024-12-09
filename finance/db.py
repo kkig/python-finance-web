@@ -51,12 +51,16 @@ class DB:
             "   VALUES (?, ?, ?, ?)",
             (
                 id,
-                symbol,
+                symbol.upper(),
                 shares,
                 price,
             ),
         )
         self.commit()
+
+    def get_user(self, user_id):
+        """Get user information."""
+        return self.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
 
     def get_shares(self, id):
         """Get counts of stock per symbol.
@@ -108,7 +112,9 @@ class Caller:
     def get(self, key, *args):
         res = None
         try:
-            if key == "shares":
+            if key == "user":
+                res = self.db.get_user(*args)
+            elif key == "shares":
                 res = self.db.get_shares(*args)
             elif key == "cash":
                 res = self.db.get_cash(*args)

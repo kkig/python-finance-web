@@ -46,11 +46,18 @@ class TestTrans:
         with app.app_context():
             db = database()
             stocks = db.get("shares", 1)
-        assert stocks[1]["symbol"] == "nflx"
+        assert stocks[1]["symbol"] == "NFLX"
         assert stocks[1]["shares"] == 6
 
 
 class TestUsers:
+    def test_get_user(self, app):
+        with app.app_context():
+            db = database()
+            user = db.get("user", 1)
+
+            assert user["username"] == "test"
+
     def test_get_cash(self, app):
         """Should return ther cash user has."""
         with app.app_context():

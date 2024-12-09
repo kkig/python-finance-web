@@ -1,4 +1,4 @@
-{% extends 'layout.html' %} {% block main %} {% if data %}
+{% extends 'layout.html' %} {% block main %}
 <table class="table table-striped">
   <thead>
     <tr>
@@ -8,27 +8,27 @@
       <th class="text-end">TOTAL</th>
     </tr>
   </thead>
+  {% if stocks %}
   <tbody>
-    {% for stock in data["stocks"] %}
+    {% for stock in stocks %}
     <tr>
       <td class="text-start">{{ stock["symbol"] }}</td>
       <td class="text-end">{{ stock["shares"] }}</td>
-      <td class="text-end">${{ stock["price"] }}</td>
+      <td class="text-end">{{ stock["price"] }}</td>
       <td class="text-end">{{ stock["total"] }}</td>
     </tr>
     {% endfor %}
   </tbody>
+  {% endif %}
   <tfoot>
     <tr>
       <td class="border-0 fw-bold text-end" colspan="3">Cash</td>
-      <td class="border-0 text-end">${{ data["cash"] }}</td>
+      <td class="border-0 text-end">{{ cash }}</td>
     </tr>
     <tr>
       <td class="border-0 fw-bold text-end" colspan="3">TOTAL</td>
-      <td class="border-0 w-bold text-end">${{ data["total"] }}</td>
+      <td class="border-0 w-bold text-end">{{ total }}</td>
     </tr>
   </tfoot>
 </table>
-{% else %}
-<div>No data to show.</div>
-{% endif %} {% endblock %}
+{% endblock %}

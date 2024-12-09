@@ -1,10 +1,9 @@
 from flask import flash, render_template, url_for, redirect, request, g, Blueprint
-from werkzeug.exceptions import abort
 
 from finance.helpers import apology, lookup, usd
 
 from finance.auth import login_required
-from finance.db import get_db, database
+from finance.db import database
 
 bp = Blueprint("stock", __name__)
 
@@ -22,6 +21,8 @@ def get_stock_total(user_id):
     """Get counts of stock per symbol."""
     db = database()
     shares_list = db.get("shares", user_id)
+    if len(shares_list) == 0:
+        return None
 
     total, stocks = 0, []
 
@@ -39,23 +40,27 @@ def get_stock_total(user_id):
             }
         )
 
-        # Add cash of the user to calculate total amount
-        cash = db.get("cash", user_id)
-
-    return {"total": total + cash, "stocks": stocks}
+    return {"total": total, "stocks": stocks}
 
 
 @bp.route("/")
 @login_required
 def index():
     """Show portfolio of stocks"""
-    data = get_stock_total(g.user["id"])
-    data["cash"] = usd(g.user["cash"])
-    data["total"] = usd(data["total"] + g.user["cash"])
+    user_id, cash = g.user["id"], g.user["cash"]
+    total, stocks = cash, None
+
+    shares_list = get_stock_total(user_id)
+
+    if shares_list:
+        total += shares_list["total"]
+        stocks = shares_list["stocks"]
 
     return render_template(
         "stock/index.html",
-        data=data,
+        total=usd(total),
+        cash=usd(cash),
+        stocks=stocks,
     )
 
 
@@ -67,24 +72,42 @@ def buy():
         # Validate inputs
         symbol = request.form.get("symbol")
         shares = request.form.get("shares")
-        db, quote = database(), lookup(symbol)
         error = None
 
         if not symbol or not shares:
             error = "Symbol and shares are required."
-        elif not shares.isnumeric():
-            error = "Invalid value for shares."
-        elif quote is None:
-            error = "Invalid symbol."
+
+        # Check if input is valid
+        db, quote = database(), None
 
         if error is None:
-            user_id, price = g.user["id"], quote["price"]
-            cash = db.get("cash", user_id)
-            cash_remain = cash - (int(shares) * price)
+            quote = lookup(symbol)
+            if not shares.isnumeric():
+                error = "Invalid value for shares."
+            elif quote is None:
+                error = "Invalid symbol."
+
+        # Check if there is enogh cash to buy
+        user_id, cash = g.user["id"], g.user["cash"]
+        price, cash_remain = None, cash
+
+        if error is None:
+            price = quote["price"]
+            cash_remain -= int(shares) * price
+            if cash_remain <= 0:
+                error = "Not enough cash to buy."
+
+        # Update database for valid input.
+        if error is None:
+            db.update("cash", user_id, cash_remain)
 
             data = {"id": user_id, "symbol": symbol, "shares": shares, "price": price}
-            db.update("cash", user_id, cash_remain)
             db.insert("trans", **data)
+
+            # Update global variable
+            g.pop("user", None)
+            g.user = db.get("user", user_id)
+
             # Success
             return redirect(url_for("stock.index"))
 

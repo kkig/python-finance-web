@@ -30,8 +30,22 @@ def test_post(app, client, auth):
     """Post request with valid data return index page"""
     auth.login()
     response = client.post("/buy", data={"symbol": "nflx", "shares": "5"})
+
     assert response.status_code == 302
     assert response.headers.get("Location") == "/"
+
+
+def test_post_g(app, client, auth):
+    auth.login()
+
+    with app.app_context():
+        client.get("/")
+        cash = g.user["cash"]
+
+        client.post("/buy", data={"symbol": "nflx", "shares": "5"})
+        new_cash = g.user["cash"]
+
+        assert cash != new_cash
 
 
 def test_post_insert(app, client, auth):
@@ -55,6 +69,7 @@ def test_post_insert(app, client, auth):
         ("nflx", "", b"Symbol and shares are required."),
         ("lok", "3", b"Invalid symbol."),
         ("nflx", "-5", b"Invalid value for shares."),
+        ("nflx", 10000, b"Not enough cash to buy."),
     ),
 )
 def test_post_validates(client, auth, symbol, shares, message):
@@ -75,6 +90,6 @@ def test_get_stock_total(app, auth):
         stocks = shares_list["stocks"]
         amzn = stocks[0]
 
-        assert amzn["symbol"] == "amzn"
+        assert amzn["symbol"] == "AMZN"
         assert amzn["shares"] == 5
         assert shares_list["total"] is not None
