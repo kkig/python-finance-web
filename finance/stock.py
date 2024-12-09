@@ -140,7 +140,8 @@ def quote():
             quote = lookup(symbol)
             error = None if quote else "Invalid symbol for quote."
 
-        flash(error)
+        if error:
+            flash(error)
 
     return render_template("stock/quote.html", quote=quote)
 
