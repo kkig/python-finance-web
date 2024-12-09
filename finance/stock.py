@@ -18,32 +18,31 @@ def after_request(response):
     return response
 
 
-def get_stock_total(id):
+def get_stock_total(user_id):
     """Get counts of stock per symbol."""
-    db = get_db()
-    data = db.execute(
-        "SELECT SUM(shares) as [total_shares], symbol FROM transactions"
-        "   WHERE user_id = (?) GROUP BY symbol",
-        (id,),
-    ).fetchall()
+    db = database()
+    shares_list = db.get("shares", user_id)
 
     total, stocks = 0, []
 
-    for item in data:
-        curr = lookup(item["symbol"])
-        cur_total = item["total_shares"] * curr["price"]
+    for stock in shares_list:
+        price = lookup(stock["symbol"])["price"]
+        cur_total = stock["shares"] * price
         total += cur_total
 
         stocks.append(
             {
-                "symbol": item["symbol"],
-                "shares": item["total_shares"],
-                "price": usd(curr["price"]),
+                "symbol": stock["symbol"],
+                "shares": stock["shares"],
+                "price": usd(price),
                 "total": usd(cur_total),
             }
         )
 
-    return {"total": total, "stocks": stocks}
+        # Add cash of the user to calculate total amount
+        cash = db.get("cash", user_id)
+
+    return {"total": total + cash, "stocks": stocks}
 
 
 @bp.route("/")

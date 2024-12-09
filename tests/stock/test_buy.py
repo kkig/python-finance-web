@@ -71,10 +71,10 @@ def test_post_validates(client, auth, symbol, shares, message):
 def test_get_stock_total(app, auth):
     with app.app_context():
         auth.login()
-        data = get_stock_total(1)
-        stocks = data["stocks"]
+        shares_list = get_stock_total(1)
+        stocks = shares_list["stocks"]
         amzn = stocks[0]
 
         assert amzn["symbol"] == "amzn"
         assert amzn["shares"] == 5
-        assert data["total"] is not None
+        assert shares_list["total"] is not None
