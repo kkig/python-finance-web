@@ -82,8 +82,8 @@ def buy():
 
         if error is None:
             quote = lookup(symbol)
-            if not shares.isnumeric():
-                error = "Invalid value for shares."
+            if not symbol.isalpha() or not shares.isnumeric():
+                error = "Invalid value for Symbol or Shares."
             elif quote is None:
                 error = "Invalid symbol."
 
