@@ -68,7 +68,7 @@ def test_post_insert(app, client, auth):
         ("", "", b"Symbol and shares are required."),
         ("nflx", "", b"Symbol and shares are required."),
         ("lok", "3", b"Invalid symbol."),
-        ("nflx", "-5", b"Invalid value for shares."),
+        ("nflx", "-5", b"Invalid value for Symbol or Shares."),
         ("nflx", 10000, b"Not enough cash to buy."),
     ),
 )
