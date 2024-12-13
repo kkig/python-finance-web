@@ -69,15 +69,12 @@ class DB:
         :return: sum of shares by symbol in a list
         """
         records = self.execute(
-            "SELECT SUM(shares) as [total_shares], symbol FROM transactions"
+            "SELECT SUM(shares) as [shares], symbol FROM transactions"
             "   WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0",
             (id,),
         ).fetchall()
 
-        return [
-            {"shares": stock["total_shares"], "symbol": stock["symbol"]}
-            for stock in records
-        ]
+        return records
 
     def get_cash(self, id):
         """Get cash of the user.

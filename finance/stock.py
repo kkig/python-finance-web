@@ -150,10 +150,36 @@ def quote():
 @login_required
 def sell():
     """Sell shares of stock"""
-    if request.method == "POST":
-        return apology("TODO")
-
     db = database()
     stocks = db.get("shares", g.user["id"])
+
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        shares = request.form.get("shares")
+        error = None
+
+        # Validate input
+        if not symbol or not shares:
+            error = "Symbol and number of shares are required."
+        elif not symbol.isalpha() or not shares.isnumeric():
+            error = "Invalid input for symbol or number of shares."
+        else:
+            shares = int(shares)
+
+        # Ensure that the user has enough shares to sell
+        if error is None:
+            owned_share = 0
+            for stock in stocks:
+                if stock["symbol"] == symbol:
+                    owned_share = stock["shares"]
+
+            if owned_share >= shares:
+                error = "Not enough or no shares for the symbol."
+
+        # Sell stock
+        if error is None:
+            return apology("TODO")
+
+        flash(error)
 
     return render_template("stock/sell.html", stocks=stocks)
