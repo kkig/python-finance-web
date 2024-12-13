@@ -150,4 +150,10 @@ def quote():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    if request.method == "POST":
+        return apology("TODO")
+
+    db = database()
+    stocks = db.get("shares", g.user["id"])
+
+    return render_template("stock/sell.html", stocks=stocks)

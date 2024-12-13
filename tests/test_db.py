@@ -1,7 +1,7 @@
 import sqlite3
 
 import pytest
-from finance.db import database, get_db
+from finance.db import database, get_db, DB
 
 
 def test_get_close_db(app):
@@ -48,6 +48,12 @@ class TestTrans:
             stocks = db.get("shares", 1)
         assert stocks[1]["symbol"] == "NFLX"
         assert stocks[1]["shares"] == 6
+
+    def test_get_shares_none(self, app):
+        with app.app_context():
+            db = DB()
+            stock = db.get_shares(1)
+        assert stock is not None
 
 
 class TestUsers:

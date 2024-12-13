@@ -70,7 +70,7 @@ class DB:
         """
         records = self.execute(
             "SELECT SUM(shares) as [total_shares], symbol FROM transactions"
-            "   WHERE user_id = ? GROUP BY symbol",
+            "   WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0",
             (id,),
         ).fetchall()
 
