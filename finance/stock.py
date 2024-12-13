@@ -150,8 +150,8 @@ def quote():
 @login_required
 def sell():
     """Sell shares of stock"""
-    db = database()
-    stocks = db.get("shares", g.user["id"])
+    db, user_id = database(), g.user["id"]
+    stocks = db.get("shares", user_id)
 
     if request.method == "POST":
         symbol = request.form.get("symbol")
@@ -173,12 +173,24 @@ def sell():
                 if stock["symbol"] == symbol:
                     owned_share = stock["shares"]
 
-            if owned_share >= shares:
-                error = "Not enough or no shares for the symbol."
+            if owned_share < shares or shares == 0:
+                error = "Invalid amount of shares for the symbol."
 
         # Sell stock
         if error is None:
-            return apology("TODO")
+            price = lookup(symbol)["price"]
+            db.update("cash", user_id, g.user["cash"] + (price * shares))
+            g.pop("user")
+            g.user = db.get("user", user_id)
+
+            data = {
+                "id": user_id,
+                "symbol": symbol,
+                "shares": -1 * shares,
+                "price": price,
+            }
+            db.insert("trans", **data)
+            return redirect(url_for("stock.index"))
 
         flash(error)
 
