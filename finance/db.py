@@ -1,3 +1,5 @@
+"""For future project, use SQLAlchemy for optimization."""
+
 import sqlite3
 from datetime import datetime
 
@@ -58,6 +60,18 @@ class DB:
         )
         self.commit()
 
+    def get_trans(self, user_id):
+        """Get all transactions the user made.
+
+        :param user_id: id of user
+        :return: all transactions the user made
+        """
+        return self.execute(
+            "SELECT symbol, shares, price, date FROM transactions"
+            "   WHERE user_id = ?",
+            (user_id,),
+        ).fetchall()
+
     def get_user(self, user_id):
         """Get user information."""
         return self.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
@@ -115,6 +129,8 @@ class Caller:
                 res = self.db.get_shares(*args)
             elif key == "cash":
                 res = self.db.get_cash(*args)
+            elif key == "trans":
+                res = self.db.get_trans(*args)
         except sqlite3.Error as e:
             print(e)
         return res

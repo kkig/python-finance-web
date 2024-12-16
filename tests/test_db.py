@@ -42,6 +42,13 @@ class TestTrans:
             count_new = db.execute("SELECT COUNT(id) FROM transactions").fetchone()[0]
             assert count_new == count + 1
 
+    def test_get_trans(self, app):
+        with app.app_context():
+            db = DB()
+            stock = db.get_trans(1)
+        assert len(stock) == 3
+        assert stock[0]["date"].strftime("%Y-%m-%d %H:%M:%S") == "2018-01-01 00:00:00"
+
     def test_get_shares(self, app):
         with app.app_context():
             db = database()

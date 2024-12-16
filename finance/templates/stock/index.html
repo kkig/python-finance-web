@@ -5,7 +5,11 @@
       <th class="text-start">Symbol</th>
       <th class="text-end">Shares</th>
       <th class="text-end">Price</th>
+      {% if total %}
       <th class="text-end">TOTAL</th>
+      {% else %}
+      <th class="text-end">Transacted</th>
+      {% endif %}
     </tr>
   </thead>
   {% if stocks %}
@@ -14,21 +18,28 @@
     <tr>
       <td class="text-start">{{ stock["symbol"] }}</td>
       <td class="text-end">{{ stock["shares"] }}</td>
-      <td class="text-end">{{ stock["price"] }}</td>
-      <td class="text-end">{{ stock["total"] }}</td>
+      <td class="text-end">{{ stock["price"] | usd }}</td>
+      {% if stock["total"] %}
+      <td class="text-end">{{ stock["total"] | usd }}</td>
+      {% else %}
+      <td class="text-end">
+        {{ stock["date"].strftime("%Y-%m-%d %H:%M:%S") }}
+      </td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
-  {% endif %}
+  {% endif %} {% if cash and total %}
   <tfoot>
     <tr>
       <td class="border-0 fw-bold text-end" colspan="3">Cash</td>
-      <td class="border-0 text-end">{{ cash }}</td>
+      <td class="border-0 text-end">{{ cash | usd }}</td>
     </tr>
     <tr>
       <td class="border-0 fw-bold text-end" colspan="3">TOTAL</td>
-      <td class="border-0 w-bold text-end">{{ total }}</td>
+      <td class="border-0 w-bold text-end">{{ total | usd }}</td>
     </tr>
   </tfoot>
+  {% endif %}
 </table>
 {% endblock %}

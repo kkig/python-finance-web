@@ -1,6 +1,6 @@
 from flask import flash, render_template, url_for, redirect, request, g, Blueprint
 
-from finance.helpers import apology, lookup, usd
+from finance.helpers import lookup
 
 from finance.auth import login_required
 from finance.db import database
@@ -35,8 +35,8 @@ def get_stock_total(user_id):
             {
                 "symbol": stock["symbol"],
                 "shares": stock["shares"],
-                "price": usd(price),
-                "total": usd(cur_total),
+                "price": price,
+                "total": cur_total,
             }
         )
 
@@ -58,8 +58,8 @@ def index():
 
     return render_template(
         "stock/index.html",
-        total=usd(total),
-        cash=usd(cash),
+        total=total,
+        cash=cash,
         stocks=stocks,
     )
 
@@ -120,7 +120,12 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+    db, user_id = database(), g.user["id"]
+
+    # Use Flask-Babel for globalization in the future
+    stocks = db.get("trans", user_id)
+
+    return render_template("stock/index.html", stocks=stocks)
 
 
 @bp.route("/quote", methods=["GET", "POST"])
