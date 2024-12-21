@@ -17,6 +17,7 @@ def create_app(test_config=None):
         # path to SQLite database - it's under app.instance_path
         DATABASE=os.path.join(app.instance_path, "finance.db"),
         # Configure session to use cachelib (instead of signed cookies)
+        SESSION_COOKIE_SAMESITE="Strict",
         SESSION_PERMANENT=False,
         SESSION_TYPE="cachelib",
         SESSION_SERIALIZATION_FORMAT="json",
